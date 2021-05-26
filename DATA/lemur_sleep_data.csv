@@ -1,0 +1,164 @@
+,Species,Sociality,Nestbuild,Activity,study.day,Experiment,ID,dayvars.counts,dayvars.cpm,TTST,night.cpm,day.from.zero,Session
+1,Eulemur,social,nonnester,cathemeral,1,base,Aria,325763,226.2243056,553,169.7089744,-6,0
+2,Eulemur,social,nonnester,cathemeral,2,base,Aria,290395,201.6631944,520,131.3487179,-5,0
+3,Eulemur,social,nonnester,cathemeral,3,base,Aria,320603,222.6409722,562,141.4333333,-4,0
+4,Eulemur,social,nonnester,cathemeral,4,base,Aria,241954,168.0236111,593,84.99358974,-3,0
+5,Eulemur,social,nonnester,cathemeral,5,base,Aria,222414,154.4541667,600,112.3461538,-2,0
+6,Eulemur,social,nonnester,cathemeral,6,base,Aria,269798,187.3597222,530,117.224359,-1,0
+7,Eulemur,social,nonnester,cathemeral,7,absence,Aria,289963,201.3631944,505,116.0666667,0,1
+8,Eulemur,social,nonnester,cathemeral,8,absence,Aria,228074,158.3847222,571,71.66538462,1,1
+9,Eulemur,social,nonnester,cathemeral,9,absence,Aria,300654,208.7875,591,80.73076923,2,1
+10,Eulemur,social,nonnester,cathemeral,10,absence,Aria,326282,226.5847222,495,99.63717949,3,1
+11,Eulemur,social,nonnester,cathemeral,11,absence,Aria,292741,203.2923611,544,89.79102564,4,1
+12,Eulemur,social,nonnester,cathemeral,12,absence,Aria,278599,193.4715278,559,94.08717949,5,1
+13,Eulemur,social,nonnester,cathemeral,13,absence,Aria,309657,215.0395833,585,59.02820513,6,1
+14,Eulemur,social,nonnester,cathemeral,14,enhance,Aria,363835,252.6631944,491,129.724359,7,2
+15,Eulemur,social,nonnester,cathemeral,15,enhance,Aria,233578,162.2069444,598,56.59358974,8,2
+16,Eulemur,social,nonnester,cathemeral,16,enhance,Aria,267327,185.64375,574,43.89358974,9,2
+17,Eulemur,social,nonnester,cathemeral,17,enhance,Aria,288705,200.4895833,563,66.42435897,10,2
+18,Eulemur,social,nonnester,cathemeral,18,enhance,Aria,242309,168.2701389,611,50.31538462,11,2
+19,Eulemur,social,nonnester,cathemeral,19,enhance,Aria,243015,168.7604167,580,54.57564103,12,2
+20,Eulemur,social,nonnester,cathemeral,20,enhance,Aria,309927,215.2270833,527,65.28717949,13,2
+21,Eulemur,social,nonnester,cathemeral,1,base,Geb,149184,103.6,625,75.35769231,-6,0
+22,Eulemur,social,nonnester,cathemeral,2,base,Geb,179422,124.5986111,621,72.77179487,-5,0
+23,Eulemur,social,nonnester,cathemeral,3,base,Geb,166528,115.6444444,630,60.96794872,-4,0
+24,Eulemur,social,nonnester,cathemeral,4,base,Geb,140319,97.44375,637,49.69358974,-3,0
+25,Eulemur,social,nonnester,cathemeral,5,base,Geb,127628,88.63055556,689,60.56153846,-2,0
+26,Eulemur,social,nonnester,cathemeral,6,base,Geb,151479,105.19375,657,54.9,-1,0
+27,Eulemur,social,nonnester,cathemeral,7,enhance,Geb,130898,90.90138889,612,48.40769231,0,1
+28,Eulemur,social,nonnester,cathemeral,8,enhance,Geb,96494,67.00972222,614,31.92564103,1,1
+29,Eulemur,social,nonnester,cathemeral,9,enhance,Geb,120574,83.73194444,636,27.9474359,2,1
+30,Eulemur,social,nonnester,cathemeral,10,enhance,Geb,145523,101.0576389,550,41.43205128,3,1
+31,Eulemur,social,nonnester,cathemeral,11,enhance,Geb,116955,81.21875,672,32.45897436,4,1
+32,Eulemur,social,nonnester,cathemeral,12,enhance,Geb,126221,87.65347222,705,25.12435897,5,1
+33,Eulemur,social,nonnester,cathemeral,13,enhance,Geb,127238,88.35972222,704,20.36923077,6,1
+34,Eulemur,social,nonnester,cathemeral,14,absence,Geb,177288,123.1166667,505,65.45641026,7,2
+35,Eulemur,social,nonnester,cathemeral,15,absence,Geb,135339,93.98541667,514,43.36153846,8,2
+36,Eulemur,social,nonnester,cathemeral,16,absence,Geb,158138,109.8180556,533,28.95128205,9,2
+37,Eulemur,social,nonnester,cathemeral,17,absence,Geb,152189,105.6868056,599,46.6,10,2
+38,Eulemur,social,nonnester,cathemeral,18,absence,Geb,138870,96.4375,645,29.24615385,11,2
+39,Eulemur,social,nonnester,cathemeral,19,absence,Geb,173539,120.5131944,606,41.52564103,12,2
+40,Eulemur,social,nonnester,cathemeral,20,absence,Geb,201373,139.8423611,555,35.54615385,13,2
+41,Lemur,high.social,nonnester,cathemeral,1,base,Persephone,222698,154.6513889,559,75.16944444,-6,0
+42,Lemur,high.social,nonnester,cathemeral,2,base,Persephone,227764,158.1694444,568,74.7125,-5,0
+43,Lemur,high.social,nonnester,cathemeral,3,base,Persephone,181571,126.0909722,579,34.64861111,-4,0
+44,Lemur,high.social,nonnester,cathemeral,4,base,Persephone,211936,147.1777778,538,103.9819444,-3,0
+45,Lemur,high.social,nonnester,cathemeral,5,base,Persephone,198084,137.5583333,594,72.72222222,-2,0
+46,Lemur,high.social,nonnester,cathemeral,6,base,Persephone,205428,142.6583333,567,90.10972222,-1,0
+47,Lemur,high.social,nonnester,cathemeral,7,absence,Persephone,212931,147.86875,522,76.06111111,0,1
+48,Lemur,high.social,nonnester,cathemeral,8,absence,Persephone,197305,137.0173611,595,29.34444444,1,1
+49,Lemur,high.social,nonnester,cathemeral,9,absence,Persephone,215351,149.5493056,662,26.73333333,2,1
+50,Lemur,high.social,nonnester,cathemeral,10,absence,Persephone,157631,109.4659722,657,19.65416667,3,1
+51,Lemur,high.social,nonnester,cathemeral,11,absence,Persephone,169780,117.9027778,666,17.90694444,4,1
+52,Lemur,high.social,nonnester,cathemeral,12,absence,Persephone,204108,141.7416667,552,79.62361111,5,1
+53,Lemur,high.social,nonnester,cathemeral,13,absence,Persephone,191072,132.6888889,639,55.29722222,6,1
+54,Lemur,high.social,nonnester,cathemeral,14,enhance,Persephone,153927,106.89375,608,28.03194444,7,2
+55,Lemur,high.social,nonnester,cathemeral,15,enhance,Persephone,132574,92.06527778,646,25.725,8,2
+56,Lemur,high.social,nonnester,cathemeral,16,enhance,Persephone,170020,118.0694444,625,28.79444444,9,2
+57,Lemur,high.social,nonnester,cathemeral,17,enhance,Persephone,166123,115.3631944,593,31.79583333,10,2
+58,Lemur,high.social,nonnester,cathemeral,18,enhance,Persephone,160934,111.7597222,619,45.18611111,11,2
+59,Lemur,high.social,nonnester,cathemeral,19,enhance,Persephone,153795,106.8020833,630,57.45138889,12,2
+60,Lemur,high.social,nonnester,cathemeral,20,enhance,Persephone,232976,161.7888889,560,67.88888889,13,2
+61,Lemur,high.social,nonnester,cathemeral,1,base,Teres,132346,91.90694444,718,42.80833333,-6,0
+62,Lemur,high.social,nonnester,cathemeral,2,base,Teres,151894,105.4819444,724,31.85,-5,0
+63,Lemur,high.social,nonnester,cathemeral,3,base,Teres,127076,88.24722222,774,18.89166667,-4,0
+64,Lemur,high.social,nonnester,cathemeral,4,base,Teres,151654,105.3152778,687,52.97361111,-3,0
+65,Lemur,high.social,nonnester,cathemeral,5,base,Teres,132292,91.86944444,772,33.48055556,-2,0
+66,Lemur,high.social,nonnester,cathemeral,6,base,Teres,163022,113.2097222,711,62.18055556,-1,0
+67,Lemur,high.social,nonnester,cathemeral,7,enhance,Teres,154022,106.9597222,702,27.93888889,0,1
+68,Lemur,high.social,nonnester,cathemeral,8,enhance,Teres,122681,85.19513889,777,20.13055556,1,1
+69,Lemur,high.social,nonnester,cathemeral,9,enhance,Teres,143949,99.96458333,816,15.10694444,2,1
+70,Lemur,high.social,nonnester,cathemeral,10,enhance,Teres,128105,88.96180556,830,8.7,3,1
+71,Lemur,high.social,nonnester,cathemeral,11,enhance,Teres,136320,94.66666667,769,17.05,4,1
+72,Lemur,high.social,nonnester,cathemeral,12,enhance,Teres,159885,111.03125,707,52.30555556,5,1
+73,Lemur,high.social,nonnester,cathemeral,13,enhance,Teres,132963,92.33541667,788,38.13888889,6,1
+74,Lemur,high.social,nonnester,cathemeral,14,absence,Teres,126265,87.68402778,712,19.02638889,7,2
+75,Lemur,high.social,nonnester,cathemeral,15,absence,Teres,101806,70.69861111,757,19.83888889,8,2
+76,Lemur,high.social,nonnester,cathemeral,16,absence,Teres,98950,68.71527778,809,21.66388889,9,2
+77,Lemur,high.social,nonnester,cathemeral,17,absence,Teres,126404,87.78055556,739,21.61111111,10,2
+78,Lemur,high.social,nonnester,cathemeral,18,absence,Teres,122927,85.36597222,781,20.42638889,11,2
+79,Lemur,high.social,nonnester,cathemeral,19,absence,Teres,120281,83.52847222,771,38.45277778,12,2
+80,Lemur,high.social,nonnester,cathemeral,20,absence,Teres,189521,131.6118056,647,52.66805556,13,2
+81,Propithecus,social,nonnester,diurnal,1,base,Beatrice,99872,69.35555556,646,79.01527778,-7,0
+82,Propithecus,social,nonnester,diurnal,2,base,Beatrice,104038,72.24861111,643,67.06805556,-6,0
+83,Propithecus,social,nonnester,diurnal,3,base,Beatrice,91756,63.71944444,708,49.4375,-5,0
+84,Propithecus,social,nonnester,diurnal,4,base,Beatrice,82014,56.95416667,688,43.00694444,-4,0
+85,Propithecus,social,nonnester,diurnal,5,base,Beatrice,101658,70.59583333,563,48.55555556,-3,0
+86,Propithecus,social,nonnester,diurnal,6,base,Beatrice,94266,65.4625,669,69.72361111,-2,0
+87,Propithecus,social,nonnester,diurnal,7,base,Beatrice,93352,64.82777778,690,72.15833333,-1,0
+88,Propithecus,social,nonnester,diurnal,8,enhance,Beatrice,94069,65.32569444,695,77.60833333,0,1
+89,Propithecus,social,nonnester,diurnal,9,enhance,Beatrice,105127,73.00486111,667,70.42361111,1,1
+90,Propithecus,social,nonnester,diurnal,10,enhance,Beatrice,102749,71.35347222,715,66.95416667,2,1
+91,Propithecus,social,nonnester,diurnal,11,enhance,Beatrice,95248,66.14444444,773,52.35277778,3,1
+92,Propithecus,social,nonnester,diurnal,12,enhance,Beatrice,106416,73.9,723,56.7875,4,1
+93,Propithecus,social,nonnester,diurnal,13,enhance,Beatrice,74417,51.67847222,804,38.38194444,5,1
+94,Propithecus,social,nonnester,diurnal,14,enhance,Beatrice,106157,73.72013889,673,59.56805556,6,1
+95,Propithecus,social,nonnester,diurnal,15,absence,Beatrice,114041,79.19513889,588,73.425,7,2
+96,Propithecus,social,nonnester,diurnal,16,absence,Beatrice,112267,77.96319444,652,76.48888889,8,2
+97,Propithecus,social,nonnester,diurnal,17,absence,Beatrice,94489,65.61736111,724,75.24027778,9,2
+98,Propithecus,social,nonnester,diurnal,18,absence,Beatrice,105130,73.00694444,692,67.71388889,10,2
+99,Propithecus,social,nonnester,diurnal,19,absence,Beatrice,86784,60.26666667,699,58.06111111,11,2
+100,Propithecus,social,nonnester,diurnal,20,absence,Beatrice,84279,58.52708333,713,45.36111111,12,2
+101,Propithecus,social,nonnester,diurnal,1,base,Bertha,135224,93.90555556,658,15.92916667,-7,0
+102,Propithecus,social,nonnester,diurnal,2,base,Bertha,113659,78.92986111,790,7.027777778,-6,0
+103,Propithecus,social,nonnester,diurnal,3,base,Bertha,148719,103.2770833,775,10.97916667,-5,0
+104,Propithecus,social,nonnester,diurnal,4,base,Bertha,132829,92.24236111,716,17.01666667,-4,0
+105,Propithecus,social,nonnester,diurnal,5,base,Bertha,113794,79.02361111,719,13.49861111,-3,0
+106,Propithecus,social,nonnester,diurnal,6,base,Bertha,139235,96.69097222,689,21.88888889,-2,0
+107,Propithecus,social,nonnester,diurnal,7,base,Bertha,133707,92.85208333,757,9.355555556,-1,0
+108,Propithecus,social,nonnester,diurnal,8,absence,Bertha,138172,95.95277778,707,13.02638889,0,1
+109,Propithecus,social,nonnester,diurnal,9,absence,Bertha,144322,100.2236111,752,4.215277778,1,1
+110,Propithecus,social,nonnester,diurnal,10,absence,Bertha,146876,101.9972222,743,4.868055556,2,1
+111,Propithecus,social,nonnester,diurnal,11,absence,Bertha,123451,85.72986111,769,3.366666667,3,1
+112,Propithecus,social,nonnester,diurnal,12,absence,Bertha,142245,98.78125,835,4.118055556,4,1
+113,Propithecus,social,nonnester,diurnal,13,absence,Bertha,161040,111.8333333,743,8.116666667,5,1
+114,Propithecus,social,nonnester,diurnal,14,absence,Bertha,89146,61.90694444,792,7.018055556,6,1
+115,Propithecus,social,nonnester,diurnal,15,enhance,Bertha,137496,95.48333333,729,3.722222222,7,2
+116,Propithecus,social,nonnester,diurnal,16,enhance,Bertha,142819,99.17986111,723,4.256944444,8,2
+117,Propithecus,social,nonnester,diurnal,17,enhance,Bertha,132459,91.98541667,716,5.633333333,9,2
+118,Propithecus,social,nonnester,diurnal,18,enhance,Bertha,106995,74.30208333,795,3.041666667,10,2
+119,Propithecus,social,nonnester,diurnal,19,enhance,Bertha,131916,91.60833333,775,4.022222222,11,2
+120,Propithecus,social,nonnester,diurnal,20,enhance,Bertha,116524,80.91944444,797,2.777777778,12,2
+121,Propithecus,social,nonnester,diurnal,21,enhance,Bertha,110451,76.70208333,779,6.083333333,13,2
+122,Varecia ,social,nestbuilder,cathemeral,1,base,Avior,203483,141.3076389,649,87.44305556,-7,0
+123,Varecia ,social,nestbuilder,cathemeral,2,base,Avior,286975,199.2881944,544,113.1888889,-6,0
+124,Varecia ,social,nestbuilder,cathemeral,3,base,Avior,182667,126.8520833,660,62.17638889,-5,0
+125,Varecia ,social,nestbuilder,cathemeral,4,base,Avior,255754,177.6069444,611,88.05416667,-4,0
+126,Varecia ,social,nestbuilder,cathemeral,5,base,Avior,189054,131.2875,661,86.51388889,-3,0
+127,Varecia ,social,nestbuilder,cathemeral,6,base,Avior,230638,160.1652778,573,88.51805556,-2,0
+128,Varecia ,social,nestbuilder,cathemeral,7,base,Avior,204581,142.0701389,681,81.87083333,-1,0
+129,Varecia ,social,nestbuilder,cathemeral,8,absence,Avior,214813,149.1756944,610,98.85138889,0,1
+130,Varecia ,social,nestbuilder,cathemeral,9,absence,Avior,287761,199.8340278,615,57.54722222,1,1
+131,Varecia ,social,nestbuilder,cathemeral,10,absence,Avior,259249,180.0340278,640,56.49861111,2,1
+132,Varecia ,social,nestbuilder,cathemeral,11,absence,Avior,200795,139.4409722,692,40.89444444,3,1
+133,Varecia ,social,nestbuilder,cathemeral,12,absence,Avior,218142,151.4875,593,74.03888889,4,1
+134,Varecia ,social,nestbuilder,cathemeral,13,absence,Avior,161485,112.1423611,671,53.43333333,5,1
+135,Varecia ,social,nestbuilder,cathemeral,14,absence,Avior,264313,183.5506944,593,78.31388889,6,1
+136,Varecia ,social,nestbuilder,cathemeral,15,enhance,Avior,213768,148.45,628,42.6875,7,2
+137,Varecia ,social,nestbuilder,cathemeral,16,enhance,Avior,153739,106.7631944,662,38.97638889,8,2
+138,Varecia ,social,nestbuilder,cathemeral,17,enhance,Avior,173976,120.8166667,642,49.63472222,9,2
+139,Varecia ,social,nestbuilder,cathemeral,18,enhance,Avior,125886,87.42083333,617,30.28888889,10,2
+140,Varecia ,social,nestbuilder,cathemeral,19,enhance,Avior,117938,81.90138889,709,17.05138889,11,2
+141,Varecia ,social,nestbuilder,cathemeral,20,enhance,Avior,136380,94.70833333,734,31.72083333,12,2
+142,Varecia ,social,nestbuilder,cathemeral,21,enhance,Avior,182809,126.9506944,672,36.53055556,13,2
+143,Varecia ,social,nestbuilder,cathemeral,1,base,Josephine,115691,80.34097222,632,40.10138889,-7,0
+144,Varecia ,social,nestbuilder,cathemeral,2,base,Josephine,149459,103.7909722,555,52.87916667,-6,0
+145,Varecia ,social,nestbuilder,cathemeral,3,base,Josephine,141486,98.25416667,584,42.36805556,-5,0
+146,Varecia ,social,nestbuilder,cathemeral,4,base,Josephine,148986,103.4625,572,39.62361111,-4,0
+147,Varecia ,social,nestbuilder,cathemeral,5,base,Josephine,168765,117.1979167,646,43.74305556,-3,0
+148,Varecia ,social,nestbuilder,cathemeral,6,base,Josephine,200140,138.9861111,590,74.42361111,-2,0
+149,Varecia ,social,nestbuilder,cathemeral,7,base,Josephine,140011,97.22986111,629,30.36666667,-1,0
+150,Varecia ,social,nestbuilder,cathemeral,8,enhance,Josephine,135553,94.13402778,562,46.1125,0,1
+151,Varecia ,social,nestbuilder,cathemeral,9,enhance,Josephine,149918,104.1097222,639,37.30972222,1,1
+152,Varecia ,social,nestbuilder,cathemeral,10,enhance,Josephine,136151,94.54930556,599,35.45555556,2,1
+153,Varecia ,social,nestbuilder,cathemeral,11,enhance,Josephine,129222,89.7375,679,37.02222222,3,1
+154,Varecia ,social,nestbuilder,cathemeral,12,enhance,Josephine,126304,87.71111111,651,29.51388889,4,1
+155,Varecia ,social,nestbuilder,cathemeral,13,enhance,Josephine,127536,88.56666667,658,34.60555556,5,1
+156,Varecia ,social,nestbuilder,cathemeral,14,enhance,Josephine,139559,96.91597222,664,46.34722222,6,1
+157,Varecia ,social,nestbuilder,cathemeral,15,absence,Josephine,158797,110.2756944,566,39.86388889,7,2
+158,Varecia ,social,nestbuilder,cathemeral,16,absence,Josephine,124353,86.35625,598,35.97777778,8,2
+159,Varecia ,social,nestbuilder,cathemeral,17,absence,Josephine,130252,90.45277778,603,33.22638889,9,2
+160,Varecia ,social,nestbuilder,cathemeral,18,absence,Josephine,129482,89.91805556,580,42.54166667,10,2
+161,Varecia ,social,nestbuilder,cathemeral,19,absence,Josephine,149625,103.90625,573,31.92361111,11,2
+162,Varecia ,social,nestbuilder,cathemeral,20,absence,Josephine,144882,100.6125,595,37.54305556,12,2
+163,Varecia ,social,nestbuilder,cathemeral,21,absence,Josephine,166200,115.4166667,567,38.63333333,13,2
