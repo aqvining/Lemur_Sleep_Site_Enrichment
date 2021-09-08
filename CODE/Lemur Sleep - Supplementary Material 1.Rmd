@@ -1,76 +1,147 @@
 ---
 title: "Effects of Sleep Site Manipulation on Lemur Sleep Quality - Statistical Report"
 author: "Alexander Vining"
-date: "March 10, 2021"
+date: "August 24, 2021"
 output:
   word_document: default
   html_document: default
 ---
-
-All code and data used to generate this report can be found at https://github.com/aqvining/Lemur_Sleep_Site_Enrichment
-
 # Analytical Framework
 
-We take a step-wise approach to building and testing a series of increasingly complex linear mixed effects models to understand the processes driving twenty-four hour total sleep time (TTST) in our subject lemurs. We begin by modeling only the random effect of individual (nested within species), assuming our manipulations had no effect (model 0). We then examine the temporal autocorrelation of total sleep time across nights, choosing an autoregressive model to control for within-group correlation in our data (model 1). Finally, we add parameters describing our experimental structure to this model, including coefficients for the three levels of experimental condition, the two orders the conditions were presented in, and their interactions (model 2). We use delta AICs at each step to assess whether the more complex model provides a sufficiently improved fit to the data. Before making inferences about the effects of our experimental structure, we plot the normalized residuals against predicted values and the quantiles of a standard normal distribution to ensure our model meets the assumptions of being IID. Finally, we quantify the contrasts of each level of experimental condition, marginal to order, and test for significance in each.
+We take a step-wise approach to building and testing a series of increasingly complex linear mixed effects models to understand the processes driving twenty-four hour total sleep time (TST) in our subject lemurs. We begin by modeling only the random effect of individual (nested within species), assuming our manipulations had no effect (model 0). We then examine the temporal autocorrelation of total sleep time across nights, choosing an autoregressive model to control for within-group correlation in our data (model 1). Finally, we add parameters describing our experimental structure to this model, including coefficients for the three levels of experimental condition, the two orders the conditions were presented in, and their interactions (model 2). We use delta AICs at each step to assess whether the more complex model provides a sufficiently improved fit to the data. Before making inferences about the effects of our experimental structure, we plot the normalized residuals against predicted values and the quantiles of a standard normal distribution to ensure our model meets the assumptions of being IID. Finally, we quantify the contrasts of each level of experimental condition, marginal to order, and test for significance in each.
+
+We then use a similar approach to analyze two other metrics that summarize sleep across experimental periods: interdaily stability and intradaily variability. Because these metrics each assign a single value to an entire exprimental period, we model them with the same interaction between condition and order and with random effects for species and individual (nested), but do no include temporal autocorrelation in the model.
 
 # The Data
 
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath("C:\\Users\\avining\\Documents\\Lemur_Sleep"))
 library(tidyverse)
 library(nlme)
+library(lme4)
 library(RColorBrewer)
 ```
+First, we load the raw data for each species, combine hem into a single dataframe, and generate from this dataframe the total daily sleep times.
 
-Prior to building and testing these models, we visualized TTST over time for each individual lemur
+```{r data_processing, message = FALSE}
+raw_data <- vector("list", length = 4)
+names(raw_data) <- c("eulemur", "lemur", "propithecus", "varecia")
+raw_data[[1]] <- read_csv("./Data/Eulemur_raw.csv")
+raw_data[[2]] <- read_csv("./Data/Lemur_raw.csv")
+raw_data[[3]] <- read_csv("./Data/Propithecus_raw data.csv")
+raw_data[[4]] <- read_csv("./Data/Varecia_raw.csv")
 
-```{r data_prep}
-sleep_data <- read_csv("../DATA/lemur_sleep_data.csv")
-sleep_data$Session <- factor(sleep_data$Session)
+raw_data[[3]] <- filter(raw_data[[3]], time <= (21*24*60)) # remove final day for Bertha and Beatrice (day 22, collars came off)
+
+experimental_metadata <- read_csv("./Data/metadata_days.csv")
+
+#consoldate data into a long dataframe for analysis
+raw_dataframe <- raw_data %>% lapply(pivot_longer, cols = -1, names_to = "ID", values_to = "counts") %>%
+  do.call(what = rbind, args = .)
+raw_dataframe$ID <- factor(raw_dataframe$ID, levels = c("Aria", "Geb", "Persephone", "Teres", "Beatrice", "Bertha", "Avior", "Josephine")) #order factor levels for metadata
+raw_dataframe <-  arrange(raw_dataframe, ID)
+
+raw_dataframe$Condition <- rep(experimental_metadata$Experiment, each = (60*24))
+
+raw_dataframe <- raw_dataframe %>% mutate(Order = factor(ifelse(ID %in% c("Aria", "Bertha", "Avior", "Persephone"), "absence", "enhance")),
+                                          Species = factor(ifelse(ID %in% c("Aria", "Geb"), "Eulemur",
+                                                                  ifelse(ID %in% c("Bertha", "Beatrice"), "Propithecus",
+                                                                         ifelse(ID %in% c("Avior", "Josephine"), "Varecia", "Lemur")))
+                                                           )
+)
+raw_dataframe <- raw_dataframe %>% mutate(Day = (time-1) %/% (24*60) + 1, 
+                                          hour = ((time-1) %% (24*60) %/% 60) + 1,
+                                          minute = (time-1) %% (24*60))
+
+sleep_data <- raw_dataframe %>% group_by(ID, Day, Species, Order, Condition) %>% 
+  summarise(TST = sum(counts <= 0), dayvars.counts = sum(counts), Session = NA) %>%#session column updated in next chunk
+  ungroup()
+
 sleep_data$Species <- factor(sleep_data$Species)
-sleep_data$Experiment <- factor(sleep_data$Experiment, levels = c("base", "absence", "enhance")) #order factor levels of experimental condition to set up baseline as intercept
-sleep_data$ID <- factor(sleep_data$ID, levels = c("Aria", "Geb", "Bertha", "Beatrice", "Avior", "Josephine", "Persephone", "Teres")) #order factor levels for nice plots
+sleep_data$Condition <- factor(sleep_data$Condition, levels = c("base", "absence", "enhance")) #order factor levels of experimental condition to set up baseline as intercept
 
-#add the experimental order to data frame (previously encoded trial by trial in the Session column)
-sleep_data$Order <- rep(factor(c("absence", "enhance", "absence", "enhance", "absence", "enhance", "absence", "enhance")),
-                        times = sapply(levels(sleep_data$ID), function(X) nrow(filter(sleep_data, ID == X))))
+for(i in 1:nrow(sleep_data)){ #Assigns session numbers to days by starting at one and increasing whenever the experimental condition changes. Resets at 3(sessions per individual)
+  sleep_data$Session[i] <- 1 + sum(diff(as.numeric(sleep_data$Condition[1:i])) != 0) %% 3
+}
 
+sleep_data$Session <- factor(sleep_data$Session)
 ```
 
-```{r data_visualization, echo = FALSE} 
+Second, we use the raw data to calculate interdaily stability and intradaily variability for each experimental period. And visualize these results by individual and condition.
+
+```{r IS_IV}
+
+
+get_IS <- function(count_series) {
+  #quantify interdaily stability of a time series of actigraphy count data. Assumes counts every minute. Equation in Van Someren et al. 1999 Bright Light Therapy . . .
+  p <- 60 * 24 #number of datum per day
+  x_bar <- mean(count_series$counts)
+  variance_daily_pattern <- count_series %>% group_by(minute) %>% 
+    summarize(daily_pattern = (mean(counts) - x_bar)^2) %>%       #for every minute in the day, get the average deviation in counts in that minute from the full average
+    .$daily_pattern %>% sum() / p #variance of average 24hr pattern
+  overall_variance <- sum((count_series$counts - x_bar)^2) / nrow(count_series)
+  IS <- variance_daily_pattern/overall_variance
+  return(IS)
+}
+
+get_IV <- function(count_series){
+  #quantify intradaily variability of a time series of actigraphy count data. Assumes counts every minute. Equation in Van Someren et al. 1999 Bright Light Therapy . . .
+  mean_sq_diff_next <- sum(diff(count_series$counts)^2) / (nrow(count_series) -1) # mean square difference of all successive minutes
+  mean_sq_diff_grandmean <- sum((count_series$counts - mean(count_series$counts))^2)/nrow(count_series) #mean square difference of all data to grand mean
+  IV <- mean_sq_diff_next/mean_sq_diff_grandmean
+  return(IV)
+}
+
+sleep_patterns <- raw_dataframe %>% group_by(ID, Condition, Order, Species) %>% do(data.frame(IS = get_IS(.), IV = get_IV(.), Days = .$Day %>% unique() %>% length()))
+ggplot(sleep_patterns) + geom_point(aes(x = Condition, y = IS, color = ID))
+ggplot(sleep_patterns) + geom_point(aes(x = Condition, y = IV, color = ID))
+
+pattern_plots_base <- ggplot(sleep_patterns, aes(x = Condition)) + theme_classic()
+pattern_plots_base + geom_boxplot(aes(y = IV), fill = "light green") 
+pattern_plots_base + geom_boxplot(aes(y = IS), fill = "light blue")
+```
+
+
+For TST, we visualize values over all nights by individual, sorting individuals into left and right columns by the order their experimental conditions were presented in.
+
+```{r data_visualization, message = FALSE} 
 data_summary <- sleep_data %>% group_by(ID) %>% 
-  summarize(Base_N = sum(Experiment == "base"),  
-            Base_Mean = round(mean(TTST[Experiment == "base"]),1), 
-            Base_sd = round(sd(TTST[Experiment == "base"]),2), 
-            Enriched_N = sum(Experiment == "enhance"), 
-            Enr_Mean = round(mean(TTST[Experiment == "enhance"]),1), 
-            Enr_sd = round(sd(TTST[Experiment == "enhance"]),2), 
-            Impoverished_N = sum(Experiment == "absence"), 
-            Imp_Mean = round(mean(TTST[Experiment == "absence"]),1), 
-            Imp_sd = round(sd(TTST[Experiment == "absence"]),2)) 
+  summarize(Base_N = sum(Condition == "base"),  
+            Base_Mean = round(mean(TST[Condition == "base"]),1), 
+            Base_sd = round(sd(TST[Condition == "base"]),2), 
+            Enriched_N = sum(Condition == "enhance"), 
+            Enr_Mean = round(mean(TST[Condition == "enhance"]),1), 
+            Enr_sd = round(sd(TST[Condition == "enhance"]),2), 
+            Impoverished_N = sum(Condition == "absence"), 
+            Imp_Mean = round(mean(TST[Condition == "absence"]),1), 
+            Imp_sd = round(sd(TST[Condition == "absence"]),2)) 
  
  
 print(data_summary) 
- 
 
-ggplot(sleep_data, aes(x = day.from.zero,  
-                       y = TTST)) +  
+sleep_data$ID <- factor(sleep_data$ID, levels = c("Aria", "Geb", "Bertha", "Beatrice", "Avior", "Josephine", "Persephone", "Teres")) #order factor levels for nice plots
+
+ggplot(sleep_data, aes(x = Day,  
+                       y = TST)) +  
   geom_line(aes(color = Species,group = Session)) + 
-  geom_point(aes(color = Species, shape = Experiment)) + 
+  geom_point(aes(color = Species, shape = Condition)) + 
   facet_wrap(~ID, ncol = 2) + 
-  labs(x = element_text("Study Day"), y = element_text("Total 24-Hour Sleep Time"), title = element_text("Daily Lemur Sleep Patterns")) + 
+  labs(x = element_text("Study Day"), y = element_text("Total 24-Hour Sleep Time (minutes)"), title = element_text("Daily Lemur Sleep Patterns")) + 
   scale_color_brewer(palette = "Dark2") + 
   scale_shape_discrete(name = "Condition", labels = c("Baseline", "Impoverished","Enriched")) + 
   theme_classic()
 
 #for Figure 2 Output
-tiff(filename = "../Docs/Figure 2_Lemur Sleep Patterns.tif", width = 1200, height = 800)
-print(ggplot(sleep_data, aes(x = day.from.zero, 
-                             y = TTST)) + 
+tiff(filename = "./Docs/Figure 2_Lemur Sleep Patterns.tif", width = 1200, height = 800)
+print(ggplot(sleep_data, aes(x = Day, 
+                             y = TST)) + 
         geom_line(aes(color = Species,group = Session), size = 1) +
-        geom_point(aes(color = Species, shape = Experiment), size = 4) +
+        geom_point(aes(color = Species, shape = Condition), size = 4) +
         facet_wrap(~ID, ncol = 2) +
-        labs(x = element_text("Study Day"), y = element_text("Total 24-Hour Sleep Time"), title = element_text("Daily Lemur Sleep Patterns")) +
+        labs(x = element_text("Study Day"), y = element_text("Total 24-Hour Sleep Time (minutes)"), title = element_text("Daily Lemur Sleep Patterns")) +
         scale_color_brewer(palette = "Dark2") +
         scale_shape_discrete(name = "Condition", labels = c("Baseline", "Impoverished","Enriched")) +
         theme_classic() +
@@ -82,28 +153,30 @@ dev.off()
  
 ``` 
 
-# Null Model: Random Effects
+# TST Analysis
 
-We begin simply by modeling our data as normally distributed around a mean, with random effects to that mean for each individual (nested within its species). Anticipating autoregressive effects because these data are a time-series of a biorhythm, we visuallize the autocorrelation up to the duration of a single experimental condition.
+## Null Model: Random Effects
+
+We begin simply by modeling our data as normally distributed around a mean, with random effects to that mean for each individual (nested within its species). Anticipating autoregressive effects because these data are a time-series of a biorhythm, we visualize the autocorrelation up to the duration of a single experimental condition.
 
 ```{r m0_random_effects}
-m0_lemur_sleep <- lme(TTST ~ 1, data = sleep_data, random = ~1|Species/ID, method = "ML")
+m0_lemur_sleep <- lme(TST ~ 1, data = sleep_data, random = ~1|Species/ID, method = "ML")
 plot(ACF(m0_lemur_sleep, maxLag = 6), alpha = 0.01)
 ```
 
 We do not see significant autocorrelation, however, because of our strong prior expectations that these time series data have some temporal dependencies we chose to implement temporal structure into our model anyway, but based on these plots start with a simple AR structure.
 
-# Model 1: Time-Series Analysis  
+## Model 1: Time-Series Analysis  
 
-We thus modeled TTST as a first order auto-regressive process (AR1) centered on some true mean with individual-based variance in this mean plus noise. In non-jargon terms, this means we predicted any given lemur's sleep on any given night based on an estimated mean TTST for that lemur, that lemur's deviance from their mean TTST on the previous two nights, and an estimation of observation error across all lemurs and nights. Formally
+We thus modeled TST as a first order auto-regressive process (AR1) centered on some true mean with individual-based variance in this mean plus noise. In non-jargon terms, this means we predicted any given lemur's sleep on any given night based on an estimated mean TST for that lemur, that lemur's deviance from their mean TST on the previous two nights, and an estimation of observation error across all lemurs and nights. Formally
 
-$$TTST_{s,j,t} = \mu + \phi _1 (TTST_{s,j,t-1}) + U_s + V_j + E_{s,j,t}$$
+$$TST_{s,j,t} = \mu + \phi _1 (TST_{s,j,t-1}) + U_s + V_j + E_{s,j,t}$$
 
 
-where $TTST_{s,j,t}$ is the predicted TTST of individual $j$ from species $s$ during day $t$, $\beta _1$ is the intercept (mean) of TTST, $\phi _1$ is the magnitude of the first order temporal auto-regression, $U_s$ is the random effect of species $s$, $V_j$ is the random effect of individual $j$, and $E_{s,j,t}$ is an error term, for which all values are assumed to be normally distributed about 0.
+where $TST_{s,j,t}$ is the predicted TST of individual $j$ from species $s$ during day $t$, $\beta _1$ is the intercept (mean) of TST, $\phi _1$ is the magnitude of the first order temporal auto-regression, $U_s$ is the random effect of species $s$, $V_j$ is the random effect of individual $j$, and $E_{s,j,t}$ is an error term, for which all values are assumed to be normally distributed about 0.
 
 ```{r m1_AR1}
-m1_lemur_sleep <- update(m0_lemur_sleep, correlation = corARMA(p = 1, form = ~ day.from.zero | Species/ID), method = "ML")
+m1_lemur_sleep <- update(m0_lemur_sleep, correlation = corARMA(p = 1, form = ~ Day | Species/ID), method = "ML")
 summary(m1_lemur_sleep)
 plot(ACF(m1_lemur_sleep, maxLag = 6, resType = "n"), alpha = 0.01) #reduced lag one correlation of normalized residuals. Still notable correlation at lag 9, but given this high order, non-significance, and small dataset, probably not worth worrying about.
 AIC(m0_lemur_sleep, m1_lemur_sleep)
@@ -111,19 +184,19 @@ AIC(m0_lemur_sleep, m1_lemur_sleep)
 
 The delta AIC between model 1 and model 0 validates the inclusion of an AR1 term, and our ACF plots suggest we have sufficiently controlled for within-group data correlation to not violate IID assumption in further models.
 
-# Model 2: Experimental Structure
+## Model 2: Experimental Structure
 
 Having chosen a within-group correlation structure, we next build our experimental structure into our model. Here, we must simultaneously account for the possible effects of our experimental conditions, the order they were presented in, and interactions between the condition and the order (eg crossover or carryover effects). We achieve this with the following equation.
 
-$$TTST_{s,j,t} = \mu + \phi _1 (y_{s,j,t-1}) +\beta_C Condition_{s,j,t} + \beta_O Order_{s,j} + \beta_{C,O} Condition_{s,j,t} * Order_{s,j} + U_s + V_j + E_{s,j,t}$$
+$$TST_{s,j,t} = \mu + \phi _1 (y_{s,j,t-1}) +\beta_C Condition_{s,j,t} + \beta_O Order_{s,j} + \beta_{C,O} Condition_{s,j,t} * Order_{s,j} + U_s + V_j + E_{s,j,t}$$
 where $\beta _C$ is the regression coefficient for the experimental condition given by $Condition_{s,j,t}$, $\beta _O$ is the regression coefficient for order of experimental conditions given by $Order_{s,j}$, $\beta _{C,O}$ is the regression coefficient for the interaction of the condition-order pair given by $Condition_{s,j,t}*Order_{s,j}$, and all other terms are as in Equation 1.
 
 ```{r m2_experiment}
-m2_lemur_sleep <- update(m1_lemur_sleep, . ~ Experiment * Order, method = "ML")
+m2_lemur_sleep <- update(m1_lemur_sleep, . ~ Condition * Order, method = "ML")
 summary(m2_lemur_sleep)
 plot(ACF(m2_lemur_sleep, maxLag = 5, resType = "n"), alpha = 0.01)
 AIC(m2_lemur_sleep,m1_lemur_sleep) #despite introducing some lag3 autocorrelation into within-group normalized residuals, experimental structure greatly increases the model fit.
-intervals(m2_lemur_sleep)
+intervals(m2_lemur_sleep, which = "fixed")
 ```
 
 Satisfied that we are justified in included experimental structure in the data, we assess the asumptions of our model by looking at standardized residuals.
@@ -137,7 +210,7 @@ qqnorm(m2_lemur_sleep) #pearson residual quantiles look standard normal
 
 All assumptions of normality, homoskedasticity, and stationarity look valid.
 
-# Statistical Inference
+## Statistical Inference
 
 Because order effects and their interaction with experimental condition could potentially confound an analysis that examines experimental condition only, we use our estimated model parameters to calculate the contrast of each experimental condition relative to the others, marginal to order. Noting that the intercept represents baseline sleep when the impoverishment condition was presented before the enrichment, we calculate marginalized contrasts as in the code below.
 
@@ -180,9 +253,11 @@ anova(m2_lemur_sleep, L = contrast_matrix[1,]) #baseline v enriched contrast, si
 anova(m2_lemur_sleep, L = contrast_matrix[2,]) #baseline v impoverished, not significantly different
 
 ```
-Correcting our significance level to 0.167 using a Bonferroni adjusment for three tests, we can reject the hypotheses that sleep site enrichment does not affect total sleep time relative to baseline and impoverished conditions, but we fail to reject the hypothesis that sleep site impoverishment does not affect total sleep times relative to baseline.
 
-# Random Effects
+
+Correcting our significance level to 0.167 using a Bonferroni adjustment for three tests, we can reject the hypotheses that sleep site enrichment does not affect total sleep time relative to baseline and impoverished conditions, but we fail to reject the hypothesis that sleep site impoverishment does not affect total sleep times relative to baseline.
+
+## Random Effects
 
 We calculate intra-class correlation coefficients to compare the unstructured variance in our data attributable to each of our random effects.
 
@@ -199,6 +274,150 @@ ICC_ID
 ICC_Residual
 ```
 
+
+# IV and IS Analysis
+
+We first visualize the standardized residuals of the model using regression and qq plots to asses their normality and homoskedasticity
+
+```{r model_fitting_patterns}
+sleep_patterns$Condition <- factor(sleep_patterns$Condition, levels = c("base", "absence", "enhance"))
+m1_IS <- lme(IS ~ Condition * Order, random = ~1|Species/ID, data = sleep_patterns)
+summary(m1_IS)
+plot(x = sleep_patterns$IS, y = residuals(m1_IS)) #linear trend in residuals w/IS
+
+m1_IV <- lme(IV ~ Condition * Order, random = ~1|Species/ID, data = sleep_patterns)
+summary(m1_IV)
+plot(x = sleep_patterns$IV, y = residuals(m1_IS))
+```
+
+```{r lme_diagnostics_patterns} 
+diagnostics_data <- mutate(ungroup(m1_IS$data), prediction = predict(m1_IS), residual = residuals(m1_IS)) 
+ggplot(diagnostics_data) + geom_point(aes(x = prediction, y = residual/sd(residual))) + theme_classic() #Pearson's residuals on y. largely normal and homoskedastic 
+ 
+qqnorm(m1_IS) #pearson residual quantiles look standard normal 
+
+diagnostics_data <- mutate(ungroup(m1_IV$data), prediction = predict(m1_IV), residual = residuals(m1_IV)) 
+ggplot(diagnostics_data) + geom_point(aes(x = prediction, y = residual/sd(residual))) + theme_classic() #Pearson's residuals on y. largely normal and homoskedastic 
+ 
+qqnorm(m1_IV) #pearson residual quantiles look standard normal 
+```
+
+All assumptions of normality, homoskedasticity, and stationarity look valid.
+
+# Statistical Inference
+
+Because order effects and their interaction with experimental condition could potentially confound an analysis that examines experimental condition only, we use our estimated model parameters to calculate the contrast of each experimental condition relative to the others, marginal to order. Noting that the intercept represents baseline sleep when the impoverishment condition was presented before the enrichment, we calculate marginalized contrasts as in the code below.
+
+```{r pattern_contrast_effects}
+#effect contrasts marginal to order, get means and se
+
+##~enhanced v baseline
+enhanced_v_baseline_algebra <- c(intercept = 0, impoverish = 0, enrich = 1, enrich_first = 0, imp_by_enr1st = 0, enr_by_enr1 = 0.5) #When multiplied by coefficients matrix from model 2, calculates effect of enrichment marginal to order (with equal weights)
+enhanced_v_baseline_contrast_IS <- enhanced_v_baseline_algebra %*% m1_IS$coefficients$fixed
+enhanced_v_baseline_contrast_se_IS <- t(enhanced_v_baseline_algebra) %*% vcov(m1_IS) %*% enhanced_v_baseline_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+##~absence v baseline
+absence_v_baseline_algebra <- c(intercept = 0, impoverish = 1, enrich = 0, enrich_first = 0, imp_by_enr1st = 0.5, enr_by_enr1 = 0)#When multiplied by coefficients matrix from model 2, calculates effect of impoverishment marginal to order (with equal weights)
+absence_v_baseline_contrast_IS <- absence_v_baseline_algebra %*% m1_IS$coefficients$fixed
+absence_v_baseline_contrast_se_IS <- t(absence_v_baseline_algebra) %*% vcov(m1_IS) %*% absence_v_baseline_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+##~enhanced v absence
+enhanced_v_absence_algebra <- c(intercept = 0, impoverish = -1, enrich = 1, enrich_first = 0, imp_by_enr1st = -0.5, enr_by_enr1 = 0.5) #rename algebra. When multiplied by coefficients from model 2, does the algebra from line 86. Can also be multiplied by vcv to find se.
+enhanced_v_absence_contrast_IS <- enhanced_v_absence_algebra %*% m1_IS$coefficients$fixed #equivalent to line 86
+enhanced_v_absence_contrast_se_IS <- t(enhanced_v_absence_algebra) %*% vcov(m1_IS) %*% enhanced_v_absence_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+
+print(paste("contrast of enriched and baseline IS marginal to order is", enhanced_v_baseline_contrast_IS, "with se = ", enhanced_v_baseline_contrast_se_IS, sep = " "))
+print(paste("contrast of impoverished and baseline IS marginal to order is", absence_v_baseline_contrast_IS, "with se = ", absence_v_baseline_contrast_se_IS, sep = " "))
+print(paste("contrast of enriched and absence IS marginal to order is", enhanced_v_absence_contrast_IS, "with se = ", enhanced_v_absence_contrast_se_IS, sep = " "))
+
+#IV
+#effect contrasts marginal to order, get means and se
+
+##~enhanced v baseline
+enhanced_v_baseline_contrast_IV <- enhanced_v_baseline_algebra %*% m1_IV$coefficients$fixed
+enhanced_v_baseline_contrast_se_IV <- t(enhanced_v_baseline_algebra) %*% vcov(m1_IV) %*% enhanced_v_baseline_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+##~absence v baseline
+absence_v_baseline_contrast_IV <- absence_v_baseline_algebra %*% m1_IV$coefficients$fixed
+absence_v_baseline_contrast_se_IV <- t(absence_v_baseline_algebra) %*% vcov(m1_IV) %*% absence_v_baseline_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+##~enhanced v absence
+enhanced_v_absence_contrast_IV <- enhanced_v_absence_algebra %*% m1_IV$coefficients$fixed #equivalent to line 86
+enhanced_v_absence_contrast_se_IV <- t(enhanced_v_absence_algebra) %*% vcov(m1_IV) %*% enhanced_v_absence_algebra %>% #quadratic form to evaluate the variance of a contrast.sqrt(enhanced_v_absence_contrast_var)
+  sqrt()
+
+
+print(paste("contrast of enriched and baseline IV marginal to order is", enhanced_v_baseline_contrast_IV, "with se = ", enhanced_v_baseline_contrast_se_IV, sep = " "))
+print(paste("contrast of impoverished and baseline IV marginal to order is", absence_v_baseline_contrast_IV, "with se = ", absence_v_baseline_contrast_se_IV, sep = " "))
+print(paste("contrast of enriched and absence IV marginal to order is", enhanced_v_absence_contrast_IV, "with se = ", enhanced_v_absence_contrast_se_IV, sep = " "))
+
+```
+Next, we test the contrasts for significant differences using ANOVA
+
+```{r patterns_contrast_significance}
+contrast_matrix <- matrix(c(enhanced_v_baseline_algebra, absence_v_baseline_algebra, enhanced_v_absence_algebra), nrow = 3, byrow = TRUE, dimnames = list(c("enrich_base", "impoverish_base", "enrich_impoverish"),names(m1_IS$coefficients$fixed)))
+contrast_matrix
+
+anova(m1_IS, L = contrast_matrix[1,]) #baseline v enriched contrast, significantly different
+anova(m1_IS, L = contrast_matrix[2,]) #baseline v impoverished, not significantly different
+
+anova(m1_IV, L = contrast_matrix[1,]) #baseline v enriched contrast, not significantly different
+anova(m1_IV, L = contrast_matrix[2,]) #baseline v impoverished, significantly different!
+
+```
+And finally, we visualize the estimated confidence intervals for the contrasts.
+
+```{r contrast_plots_patterns}
+contrasts <- data.frame(Contrast = factor(rep(c("Enrich - Base", "Impoverish - Base", "Enrich - Impoverish"), times = 3)), 
+                        Difference = c(enhanced_v_baseline_contrast, absence_v_baseline_contrast, enhanced_v_absence_contrast,
+                                       enhanced_v_baseline_contrast_IS, absence_v_baseline_contrast_IS, enhanced_v_absence_contrast_IS,
+                                       enhanced_v_baseline_contrast_IV, absence_v_baseline_contrast_IV, enhanced_v_absence_contrast_IV),
+                        se = c(enhanced_v_baseline_contrast_se, absence_v_baseline_contrast_se, enhanced_v_absence_contrast_se,
+                               enhanced_v_baseline_contrast_se_IS, absence_v_baseline_contrast_se_IS, enhanced_v_absence_contrast_se_IS,
+                               enhanced_v_baseline_contrast_se_IV, absence_v_baseline_contrast_se_IV, enhanced_v_absence_contrast_se_IV),
+                        Measure = rep(c("TST", "IS", "IV"), each = 3))
+
+contrast_plot_TST <- ggplot(filter(contrasts, Measure == "TST")) + 
+  geom_point(aes(x = Contrast, y = Difference), size = 8) + 
+  #geom_errorbar(aes(x = Contrast, ymin = Difference - se, ymax = Difference + se), width = 0.3, size = 1.2) +
+  geom_errorbar(aes(x = Contrast, ymin = Difference - (2*se), ymax = Difference + (2*se)), width = 0.2, size = 1.2) +
+  theme_classic() + 
+  geom_hline(yintercept = 0, linetype = 2, color = "red") +
+  labs(y = "Difference (mins)", title = "Marginalized Differences in Total Sleep Times") +
+  theme(axis.text = element_text(size = 24),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 32, hjust = 0.5))
+
+contrast_plot_patterns <- ggplot(filter(contrasts, Measure != "TST")) + 
+  geom_point(aes(x = Contrast, y = Difference), size = 8) + 
+  #geom_errorbar(aes(x = Contrast, ymin = Difference - se, ymax = Difference + se), width = 0.3, size = 1.2) + 
+  geom_errorbar(aes(x = Contrast, ymin = Difference - (2*se), ymax = Difference + (2*se)), width = 0.2, size = 1.2) +
+  facet_wrap(~Measure) +
+  theme_classic() + 
+  geom_hline(yintercept = 0, linetype = 2, color = "red") +
+  labs(y = "Difference", title = "Marginalized Differences in Activity Patterns") +
+  theme(text = element_text(size = 24),
+        axis.text = element_text(size = 24),
+        axis.text.x = element_text(angle = 15, vjust = 0.5),
+        axis.ticks.length.x = unit(10, "mm"),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 32, hjust = 0.5))
+
+tiff(filename = "./Docs/Figure 3_Lemur Sleep Contrasts.tif", width = 1200, height = 800)
+print(contrast_plot_TST)
+dev.off()
+
+tiff(filename = "./Docs/Figure 4_Lemur Activity Pattern Contrasts.tif", width = 1200, height = 800)
+print(contrast_plot_patterns)
+dev.off()
+
+```
 
 
 
